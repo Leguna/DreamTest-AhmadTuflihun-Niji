@@ -2,7 +2,7 @@
 using Features.Utilities.SaveLoad;
 using UnityEngine;
 
-namespace Features.Utilities
+namespace Utilities
 {
     [Serializable]
     public class BaseSo : ScriptableObject, ISaveable

@@ -1,8 +1,14 @@
-﻿namespace Features.DamageModule.Interfaces
+﻿using UnityEngine;
+
+namespace DamageModule.Interfaces
 {
     public interface IDamageable
     {
-        void TakeDamage(int damage);
-        void Die();
+        void TryTakeDamage(int damage);
+    }
+
+    public interface IDamageable<in T>
+    {
+        void TryTakeDamage(int damage, GameObject attacker, T attackerSo);
     }
 }

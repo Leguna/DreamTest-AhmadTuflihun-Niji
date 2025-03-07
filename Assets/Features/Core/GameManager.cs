@@ -1,3 +1,4 @@
+using Constant;
 using LoadingModule;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        GameConst.Init();
         if (loadingManager == null) TryGetComponent(out loadingManager);
         loadingManager.Init();
     }

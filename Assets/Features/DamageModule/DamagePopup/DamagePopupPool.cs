@@ -1,5 +1,7 @@
 using Features.Utilities;
 using UnityEngine;
+using Utilities;
+using Utilities.Pooling;
 
 namespace Features.DamageModule.DamagePopup
 {
@@ -8,9 +10,9 @@ namespace Features.DamageModule.DamagePopup
         public DamagePopupComponent GetObject(int damage, Vector2 targetPos,
             Vector2 offset = default)
         {
-            var damagePopup = base.GetObject();
+            var damagePopup = base.GetObjectFromPool();
             damagePopup.Init();
-            damagePopup.ShowDamage(damage, targetPos, () => ReturnObject(damagePopup), offset);
+            damagePopup.ShowDamage(damage, targetPos, () => ReturnObjectToPool(damagePopup), offset);
             return damagePopup;
         }
     }

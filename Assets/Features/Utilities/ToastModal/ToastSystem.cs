@@ -20,6 +20,6 @@ namespace Features.Utilities.ToastModal
             toastPool.Init(toast, 5);
         }
         public static void Show(string message, float duration = 1f) =>
-            Instance.toastPool.GetObject().Show(message, duration);
+            Instance.toastPool.GetObjectFromPool().Show(message, duration);
     }
 }

@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using Facing;
+using UnityEngine;
 
 namespace TopDownPlayer
 {
     [RequireComponent(typeof(Rigidbody2D))]
     public class TopDownPlayerController : MonoBehaviour
     {
+        [SerializeField] private TopDownPlayerCombat combat;
+        
         private static readonly int X = Animator.StringToHash("MoveX");
         private static readonly int Y = Animator.StringToHash("MoveY");
         private static readonly int Moving = Animator.StringToHash("Moving");
@@ -17,6 +20,11 @@ namespace TopDownPlayer
 
         private MainGameInputAction _inputAction;
 
+        private FacingDirection _facingDirection;
+
+
+        private PlayerState _playerState;
+
         private void Awake()
         {
             Init();
@@ -24,6 +32,7 @@ namespace TopDownPlayer
 
         private void Init()
         {
+            if (combat == null) TryGetComponent(out combat);
             _rb = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
 
@@ -37,11 +46,18 @@ namespace TopDownPlayer
             _inputAction.Enable();
             _inputAction.Player.Move.performed += ctx => Move(ctx.ReadValue<Vector2>());
             _inputAction.Player.Move.canceled += _ => Move(Vector2.zero);
+            _inputAction.Player.Interact.performed += _ => combat.Attack(_facingDirection);
         }
 
         private void Move(Vector2 moveDir)
         {
             _movement = moveDir;
+            if (_movement != Vector2.zero)
+            {
+                _facingDirection = _movement.ToFacingDirection();
+                combat.UpdateFacingDirection(_facingDirection);
+            }
+
             UpdateAnim();
         }
 
@@ -63,5 +79,12 @@ namespace TopDownPlayer
         {
             _rb.linearVelocity = _movement.normalized * _model.MoveSpeed;
         }
+    }
+
+    internal enum PlayerState
+    {
+        Idle,
+        Moving,
+        Attacking
     }
 }

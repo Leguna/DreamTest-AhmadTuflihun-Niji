@@ -1,54 +1,124 @@
 ﻿using System.Collections;
+using Constant;
+using DamageModule.Interfaces;
 using DG.Tweening;
+using Facing;
+using TurnBasedCombat;
 using UnityEngine;
 
 namespace EnemyTopDown
 {
-    public class AIEnemy : MonoBehaviour
+    public partial class AIEnemy : MonoBehaviour, IDamageable<TurnBaseActorSo>
     {
         [SerializeField] private Rigidbody2D rb;
         [SerializeField] private float moveSpeed = 5f;
-        [SerializeField] private float stoppingDistance =10f;
         [SerializeField] private Transform player;
         [SerializeField] private float chaseRange = 5f;
 
         [SerializeField] private float attackRange = 1f;
+        [SerializeField] private float tryAttackRange = 1.5f;
+        [SerializeField] private float attackDelay = .5f;
         [SerializeField] private float attackCooldown = 2f;
 
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Transform faceObject;
+
+        public TurnBaseActorSo enemySo;
+
         private Vector3 _startPosition;
-        private bool _isChasing;
-        private bool _canAttack = true;
+        private EnemyState _currentState;
+        private FacingDirection _facingDirection;
 
-        private EnemyState _currentState = EnemyState.Idle;
+        private Coroutine _attackCoroutine;
 
-        private void Awake()
+
+        public void Init(TurnBaseActorSo enemySo, Vector2 enemySpawnPoint)
         {
-            player = GameObject.FindWithTag("Player").transform;
-            _startPosition = transform.position;
+            transform.position = enemySpawnPoint;
+            _startPosition = enemySpawnPoint;
+            this.enemySo = enemySo;
+            _currentState = EnemyState.Idle;
+            if (!spriteRenderer) TryGetComponent(out spriteRenderer);
+            player = GameConst.playerObject.transform;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+            if (_currentState != EnemyState.CanAttack && _currentState != EnemyState.TryAttack &&
+                _currentState != EnemyState.Stun)
+                _currentState = DetermineState(transform, player);
 
-            if (distanceToPlayer < attackRange && _canAttack)
+            switch (_currentState)
             {
-                StartCoroutine(Attack());
+                case EnemyState.Idle:
+                    break;
+                case EnemyState.Roam:
+                    ReturnToStart();
+                    break;
+                case EnemyState.Chase:
+                    ChasePlayer();
+                    break;
+                case EnemyState.CanAttack:
+                    _currentState = EnemyState.TryAttack;
+                    Attacking();
+                    break;
+                case EnemyState.TryAttack:
+                case EnemyState.Stun:
+                    break;
             }
-            else if (distanceToPlayer < chaseRange)
+        }
+
+        private void Attacking()
+        {
+            _currentState = EnemyState.TryAttack;
+            _attackCoroutine = StartCoroutine(AttackSequence());
+        }
+
+        IEnumerator AttackSequence()
+        {
+            rb.linearVelocity = Vector2.zero;
+            UpdateFacingDirection(player.position - transform.position);
+            // ReSharper disable Unity.InefficientPropertyAccess
+            Vector3 targetAttackPosition = player.position;
+            yield return new WaitForSeconds(attackDelay);
+            rb.DOMove(targetAttackPosition, attackDelay).onComplete = () => { spriteRenderer.color = Color.red; };
+            spriteRenderer.color = new Color(1, 0.5f, 0);
+            yield return new WaitForSeconds(attackCooldown);
+            ResetAttack();
+        }
+
+        private void ResetAttack()
+        {
+            StopCoroutine(_attackCoroutine);
+            DOTween.Kill(spriteRenderer);
+            DOTween.Kill(transform);
+            DOTween.Kill(rb);
+            _currentState = EnemyState.Idle;
+            spriteRenderer.color = Color.red;
+            _currentState = EnemyState.Idle;
+        }
+
+        private EnemyState DetermineState(Transform currentTransform, Transform targetTransform)
+        {
+            var distanceToPlayer = Vector2.Distance(currentTransform.position, targetTransform.position);
+
+            if (distanceToPlayer <= tryAttackRange)
             {
-                ChasePlayer();
+                return EnemyState.CanAttack;
             }
-            else if (_isChasing)
-            {
-                ReturnToStart();
-            }
+
+            if (distanceToPlayer <= chaseRange)
+                return EnemyState.Chase;
+
+            return EnemyState.Roam;
         }
 
         void ChasePlayer()
         {
-            _isChasing = true;
-            transform.position = Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+            var currentPosition = transform.position;
+            var playerPosition = player.position;
+            UpdateFacingDirection(playerPosition - currentPosition);
+            transform.position = Vector2.MoveTowards(currentPosition, playerPosition, moveSpeed * Time.deltaTime);
         }
 
         void ReturnToStart()
@@ -56,35 +126,60 @@ namespace EnemyTopDown
             transform.position = Vector2.MoveTowards(transform.position, _startPosition, moveSpeed * Time.deltaTime);
             if (Vector2.Distance(transform.position, _startPosition) < 0.1f)
             {
-                _isChasing = false;
+                _currentState = EnemyState.Idle;
             }
         }
 
-        void Patrol()
+        private void UpdateFacingDirection(Vector2 direction)
         {
-            if (_currentState == EnemyState.Idle)
+            _facingDirection = direction.ToFacingDirection();
+            if (faceObject)
+                faceObject.rotation = _facingDirection.ToRotation();
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            var position = transform.position;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(position, chaseRange);
+            Gizmos.color = new Color(1, 0.5f, 0);
+            Gizmos.DrawWireSphere(position, tryAttackRange);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(position, attackRange);
+        }
+
+        public void TryTakeDamage(int damage, GameObject attacker, TurnBaseActorSo attackerSo)
+        {
+            ResetAttack();
+            if (_currentState == EnemyState.Stun) return;
+
+            var attackerDirection = attacker.transform.position - transform.position;
+            var attackerSide = _facingDirection.GetSide(attackerDirection);
+            Debug.Log($"Enemy took {damage} damage from {attackerSo.name} on {attackerSide}");
+            _currentState = EnemyState.Stun;
+
+            spriteRenderer.DOKill();
+            transform.DOKill();
+            spriteRenderer.color = Color.red;
+
+            Sequence damageSequence = DOTween.Sequence();
+            damageSequence.Append(spriteRenderer.DOFade(0, 0.1f))
+                .Append(spriteRenderer.DOFade(1, 0.1f))
+                .Append(spriteRenderer.DOFade(0, 0.1f))
+                .Append(spriteRenderer.DOFade(1, 0.1f))
+                .AppendInterval(3)
+                .OnComplete(() => { _currentState = EnemyState.Idle; });
+
+            damageSequence.Play();
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (other.gameObject.CompareTag(GameConst.PlayerObjectName) && _currentState == EnemyState.TryAttack)
             {
-                _currentState = EnemyState.Roam;
-                Vector2 randomPos = new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
-                rb.MovePosition(randomPos);
+                other.gameObject.GetComponent<IDamageable<TurnBaseActorSo>>()
+                    ?.TryTakeDamage(enemySo.damage, gameObject, enemySo);
             }
-        }
-
-        IEnumerator Attack()
-        {
-            _canAttack = false;
-            Debug.Log("Attacking");
-            rb.DOMove(player.position, 0.5f).OnComplete(() => { rb.DOMove(_startPosition, 0.5f); });
-            yield return new WaitForSeconds(attackCooldown);
-            _canAttack = true;
-        }
-
-        public enum EnemyState
-        {
-            Idle,
-            Roam,
-            Chase,
-            Attack
         }
     }
 }

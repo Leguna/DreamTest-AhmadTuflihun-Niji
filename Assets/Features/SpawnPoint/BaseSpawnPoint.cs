@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace SpawnPoint
 {
-    public sealed class BaseSpawnPoint<T> : MonoBehaviour, ISpawnPoint<T> where T : Object
+    public class BaseSpawnPoint<T> : MonoBehaviour, ISpawnPoint<T> where T : Object
     {
-        [SerializeField] private T spawnedGameObject;
+        [SerializeField] protected T spawnedGameObject;
 
-        public T Spawn(Transform targetTransform)
+        public virtual T Spawn(Transform targetTransform)
         {
             return Instantiate(spawnedGameObject, targetTransform.position, targetTransform.rotation, transform);
         }

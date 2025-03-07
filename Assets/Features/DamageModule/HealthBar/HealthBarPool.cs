@@ -1,5 +1,7 @@
 using Features.Utilities;
 using UnityEngine;
+using Utilities;
+using Utilities.Pooling;
 
 namespace Features.DamageModule.HealthBar
 {
@@ -7,7 +9,7 @@ namespace Features.DamageModule.HealthBar
     {
         public void GetObject(IHealthBar healthBarData, Transform target, Vector2 offset = default)
         {
-            var healthBar = base.GetObject();
+            var healthBar = base.GetObjectFromPool();
             healthBar.Init(healthBarData, target, offset);
         }
     }

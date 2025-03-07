@@ -34,5 +34,6 @@ namespace Constant
         LoadingScene = 1,
         ExploreScene = 2,
         CombatScene = 3,
+        BattleScene = 4,
     }
 }

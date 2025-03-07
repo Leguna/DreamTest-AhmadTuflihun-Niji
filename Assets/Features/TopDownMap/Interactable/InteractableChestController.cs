@@ -2,6 +2,7 @@
 using DG.Tweening;
 using EventStruct;
 using Features.Core.Item;
+using Item;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;

@@ -37,7 +37,7 @@ namespace Features.DamageModule
             _onDeath = onDeath;
         }
 
-        public void TakeDamage(int damage)
+        public void TryTakeDamage(int damage)
         {
             CurrentHealth -= damage;
             OnDamageTaken?.Invoke(damage);

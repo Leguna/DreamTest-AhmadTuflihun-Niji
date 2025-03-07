@@ -32,7 +32,7 @@ namespace Features.DamageModule
 
         public void HideHealthBar(HealthBarComponent healthBarComponent)
         {
-            _healthBarPoolComponent.ReturnObject(healthBarComponent);
+            _healthBarPoolComponent.ReturnObjectToPool(healthBarComponent);
         }
     }
 }

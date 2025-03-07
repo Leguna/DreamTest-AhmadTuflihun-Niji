@@ -1,4 +1,6 @@
-﻿namespace Features.DamageModule.Interfaces
+﻿using DamageModule.Interfaces;
+
+namespace Features.DamageModule.Interfaces
 {
     public interface IWeaponController : IWeapon
     {

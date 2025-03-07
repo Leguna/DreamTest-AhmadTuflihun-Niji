@@ -8,7 +8,6 @@ using Features.Utilities.ToastModal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utilities;
-using static Constant.SceneConst;
 
 namespace LoadingModule
 {
@@ -33,6 +32,19 @@ namespace LoadingModule
             Hide();
             _tasks.Clear();
             LoadScene(defaultScene);
+        }
+
+        private void RemoveLoadedScenes()
+        {
+            int activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.buildIndex != activeSceneIndex)
+                {
+                    SceneManager.UnloadSceneAsync(scene);
+                }
+            }
         }
 
         private void OnAddTask(LoadingEventData data)
@@ -106,19 +118,22 @@ namespace LoadingModule
             }
         }
 
-        private void LoadScene(SceneIndexEnum sceneIndex, LoadingType loadingType = LoadingType.FullScreen)
+        private void LoadScene(SceneIndexEnum sceneIndex)
         {
             _currentScene = sceneIndex;
             var task = SceneManager.LoadSceneAsync((int)sceneIndex, LoadSceneMode.Additive).ToUniTask().AsTask();
             Task.Run(async () =>
             {
-                await AddTask(new LoadingEventData(task, loadingType, message: $"Loading {sceneIndex}"));
+                await AddTask(new LoadingEventData(task, loadingType: LoadingType.FullScreen,
+                    message: $"Loading {sceneIndex}"));
             });
         }
 
+
         private void UnloadScene(SceneIndexEnum sceneIndex, LoadingType loadingType = LoadingType.FullScreen)
         {
-            var task = SceneManager.UnloadSceneAsync((int)sceneIndex).ToUniTask().AsTask();
+            var task = SceneManager.UnloadSceneAsync((int)sceneIndex)?.ToUniTask().AsTask();
+            if (task == null) return;
             Task.Run(async () =>
             {
                 await AddTask(new LoadingEventData(task, loadingType, message: $"Unloading {sceneIndex}"));

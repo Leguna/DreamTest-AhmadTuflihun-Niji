@@ -1,4 +1,6 @@
-﻿namespace Constant
+﻿using UnityEngine;
+
+namespace Constant
 {
     public static class GameConst
     {
@@ -16,13 +18,14 @@
         // Resources Path
         public const string ItemIconPath = "Icon/Item/";
         public const string ItemSoPath = "SO/Items/";
-    }
-    
-    public enum FacingDirection
-    {
-        Up,
-        Down,
-        Left,
-        Right
+
+        public static GameObject playerObject;
+        public static GameObject playerCameraObject;
+        
+        public static void Init()
+        {
+            playerObject = GameObject.Find(PlayerObjectName);
+            playerCameraObject = GameObject.Find(PlayerCameraObjectName);
+        }
     }
 }
