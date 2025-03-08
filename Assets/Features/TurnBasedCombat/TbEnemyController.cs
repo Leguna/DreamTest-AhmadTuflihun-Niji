@@ -13,6 +13,7 @@ namespace TurnBasedCombat
         {
             base.Init(actor);
             this.playerControllerList = playerControllerList;
+            healthBar.UpdateBar(CurrentHealth);
         }
 
         public void PerformAction()
@@ -21,10 +22,10 @@ namespace TurnBasedCombat
 
             if (playerControllerList.Count == 0) return;
 
-            transform.position = new Vector3(0, 0, 0);
+            transform.localPosition = new Vector3(0, 0, 0);
             DOTween.Sequence()
-                .Append(transform.DOMoveX(0.5f, 0.5f))
-                .Append(transform.DOMoveX(0, 0.5f))
+                .Append(transform.DOLocalMoveX(0.5f, 0.5f))
+                .Append(transform.DOLocalMoveX(0, 0.5f))
                 .onComplete += AttackRandomPlayer;
         }
 
@@ -37,6 +38,11 @@ namespace TurnBasedCombat
 
         public void TakeDamage(int actorDataDamage)
         {
+            DOTween.KillAll();
+            DOTween.Sequence()
+                .Append(transform.DOShakePosition(0.5f, 0.5f, 10, 90, false, true))
+                .AppendCallback(() => { })
+                .Play();
             CurrentHealth -= actorDataDamage;
             if (CurrentHealth <= 0)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TurnBasedCombat.SO;
 using TurnBasedCombat.UI;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace TurnBasedCombat
@@ -12,6 +13,9 @@ namespace TurnBasedCombat
         private TurnBasedActionViewController _actionViewController;
         public Action onPlayerDeath;
         private List<TbEnemyController> _enemyControllerList;
+        public Action onPlayerFlee;
+
+        public bool isDefending;
 
         public void Init(TurnBaseActorSo actor, TurnBasedActionViewController actionViewController,
             List<TbEnemyController> enemyControllerList)
@@ -20,6 +24,7 @@ namespace TurnBasedCombat
             _actionViewController = actionViewController;
             _actionViewController.onButtonClicked += OnActionSelected;
             _enemyControllerList = enemyControllerList;
+            healthBar.UpdateBar(CurrentHealth);
         }
 
         public void Attack(TbEnemyController target)
@@ -28,18 +33,28 @@ namespace TurnBasedCombat
             {
                 target.TakeDamage(actorData.damage);
             }
+
+            isDefending = false;
         }
 
-        public void Spell()
+        public void Spell(TbEnemyController target)
         {
+            if (target != null && !target.IsDead)
+            {
+                target.TakeDamage(actorData.damage);
+            }
+
+            isDefending = false;
         }
 
         public void Defend()
         {
+            isDefending = true;
         }
 
         public void Flee()
         {
+            onPlayerFlee?.Invoke();
         }
 
         private void OnActionSelected(TurnBasedActionType obj)
@@ -53,9 +68,15 @@ namespace TurnBasedCombat
                         var enemyController = _enemyControllerList[randomIndex];
                         Attack(enemyController);
                     }
+
                     break;
                 case TurnBasedActionType.Spell:
-                    Spell();
+                    if (_enemyControllerList.Count > 0)
+                    {
+                        var randomIndex = Random.Range(0, _enemyControllerList.Count);
+                        var enemyController = _enemyControllerList[randomIndex];
+                        Spell(enemyController);
+                    }
                     break;
                 case TurnBasedActionType.Defend:
                     Defend();
@@ -76,7 +97,7 @@ namespace TurnBasedCombat
                 .Append(transform.DOShakePosition(0.5f, 0.5f, 10, 90, false, true))
                 .AppendCallback(() => { })
                 .Play();
-            CurrentHealth -= actorDataDamage;
+            CurrentHealth -= Mathf.Abs(actorDataDamage - (isDefending ? 5 : 0));
             actorData.health = CurrentHealth;
             healthBar.UpdateBar(CurrentHealth);
             if (IsDead)

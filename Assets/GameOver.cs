@@ -1,3 +1,4 @@
+using System;
 using EventStruct;
 using UnityEngine;
 using Utilities;
@@ -5,6 +6,8 @@ using Utilities;
 public class GameOver : MonoBehaviour
 {
     [SerializeField] private GameObject gameOverPanel;
+
+    public Action onTryAgain;
 
     private void Awake()
     {
@@ -24,11 +27,13 @@ public class GameOver : MonoBehaviour
     private void ShowGameOver(GameOverEventData data)
     {
         gameOverPanel.SetActive(true);
+        onTryAgain = data.onTryAgain;
     }
 
     public void TryAgain()
     {
-        GameManager.Instance.RestartGame();
+        onTryAgain?.Invoke();
+        gameOverPanel.SetActive(false);
     }
 
     public void QuitGame()

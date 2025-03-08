@@ -12,8 +12,6 @@ namespace TurnBasedCombat.UI
         private int _selectedButtonIndex;
         private MainGameInputAction _mainGameInputAction;
 
-        private bool _isButtonsShown;
-
         public Action<TurnBasedActionType> onButtonClicked;
 
         internal void Init(Action<TurnBasedActionType> onButtonClicked = null)
@@ -30,22 +28,18 @@ namespace TurnBasedCombat.UI
 
         internal void Show()
         {
-            DOTween.Kill(buttonsParent.transform);
             foreach (var actionButton in actionButtons)
                 actionButton.DeSelectButton();
             _selectedButtonIndex = 0;
             actionButtons[_selectedButtonIndex].SelectButton();
             _mainGameInputAction.Enable();
-            _isButtonsShown = true;
             buttonsParent.SetActive(true);
-            buttonsParent.transform.DOMoveX(0, 0.5f);
         }
 
         internal void Hide()
         {
             _mainGameInputAction.Disable();
-            _isButtonsShown = false;
-            buttonsParent.transform.DOMoveX(-100, 0.5f).onComplete += () => buttonsParent.SetActive(false);
+            buttonsParent.SetActive(false);
         }
 
         private void SetListener()
@@ -92,20 +86,6 @@ namespace TurnBasedCombat.UI
                 _selectedButtonIndex = (_selectedButtonIndex - 1 + actionButtons.Length) % actionButtons.Length;
                 actionButtons[_selectedButtonIndex].SelectButton();
             }
-        }
-
-        public void Toggle(bool forceShow = false)
-        {
-            if (forceShow)
-            {
-                Show();
-                return;
-            }
-
-            if (_isButtonsShown)
-                Hide();
-            else
-                Show();
         }
 
         private void OnEnable()

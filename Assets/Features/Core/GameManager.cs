@@ -15,6 +15,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     [SerializeField] private TurnBasedCombatController turnBasedCombatController;
     [SerializeField] private SceneIndexEnum defaultScene = SceneIndexEnum.ExploreScene;
     [SerializeField] private PlayerCamera playerCamera;
+    [SerializeField] private GameOver gameOver;
 
     private static GameState _gameState = GameState.Explore;
 
@@ -26,8 +27,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         if (loadingManager == null) TryGetComponent(out loadingManager);
 
         loadingManager.Init(defaultScene);
-        SceneManager.LoadScene((int) SceneIndexEnum.BattleScene, LoadSceneMode.Additive);
-        turnBasedCombatController = TurnBasedCombatController.Instance;
+        SceneManager.LoadScene((int)SceneIndexEnum.BattleScene, LoadSceneMode.Additive);
+        gameOver.onTryAgain += RestartGame;
     }
 
     public void Start()
@@ -39,7 +40,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         _gameState = SceneIndexEnum.ExploreScene == defaultScene ? GameState.Explore : GameState.Combat;
         playerPrefab.Init(_gameState);
-        turnBasedCombatController.Init();
         playerCamera = FindFirstObjectByType<PlayerCamera>();
     }
 
@@ -80,6 +80,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void RestartGame()
     {
         loadingManager.Init(defaultScene);
+        turnBasedCombatController.Init();
+        playerPrefab.Init(GameState.Explore);
     }
 }
 

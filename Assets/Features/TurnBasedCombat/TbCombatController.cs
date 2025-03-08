@@ -24,8 +24,23 @@ namespace TurnBasedCombat
         private readonly List<TurnBaseActorSo> _allCharacterData = new();
         private readonly Queue<TbCharacterController> _turnQueue = new();
 
+        private void Start()
+        {
+            Init();
+        }
+
+        public void ClearAllEnemy()
+        {
+            var enemies = FindObjectsByType<TbEnemyController>(FindObjectsSortMode.None);
+            foreach (var enemy in enemies)
+            {
+                Destroy(enemy);
+            }
+        }
+
         public void Init()
         {
+            ClearAllEnemy();
             playerData.health = playerData.maxHealth;
             actionViewController.Init();
             queueViewController.Init();
@@ -50,16 +65,17 @@ namespace TurnBasedCombat
                 case CombatStartType.Ambush:
                     playerData.speedMultiplier = playerData.speed * 0.5f;
                     playerData.health -= eventData.attackerData.damage;
+                    eventData.attackerData.health = eventData.attackerData.maxHealth;
                     break;
                 case CombatStartType.Neutral:
                     playerData.speedMultiplier = playerData.speed;
+                    eventData.attackerData.health = eventData.attackerData.maxHealth;
                     break;
             }
 
             var playerController = Instantiate(playerControllerPrefab, playerPosition);
 
             eventData.attackerData.speedMultiplier = eventData.attackerData.speed;
-            eventData.attackerData.health = eventData.attackerData.maxHealth - playerData.damage;
 
             var allEnemyController = new List<TbEnemyController>();
             var random = Random.Range(1, 3);
@@ -74,8 +90,10 @@ namespace TurnBasedCombat
                 allEnemyController.Add(enemyController);
             }
 
+
             playerController.Init(playerData, actionViewController, allEnemyController);
             playerController.onPlayerDeath += PlayerDeath;
+            playerController.onPlayerFlee += EndCombatFlee;
             allCharacterController.Add(playerController);
 
             // Sort all character by speed
@@ -98,6 +116,7 @@ namespace TurnBasedCombat
             EventManager.TriggerEvent(new GameOverEventData(onTryAgain: () =>
             {
                 playerData.health = playerData.maxHealth;
+                Init();
             }));
         }
 
@@ -127,18 +146,9 @@ namespace TurnBasedCombat
             }
         }
 
-
-        private void OnActionSelected(TurnBasedActionType obj)
-        {
-            Debug.Log("Action selected: " + obj);
-            if (obj == TurnBasedActionType.Run)
-            {
-                EndCombatFlee();
-            }
-        }
-
         private void EndCombatFlee()
         {
+            Init();
             battleScene.SetActive(false);
             EventManager.TriggerEvent(new FinishTurnBasedGameEventData(FinishType.Flee));
             EventManager.TriggerEvent(new StateGameChanges(GameState.Combat));
@@ -147,15 +157,14 @@ namespace TurnBasedCombat
 
         private void ShowBattleScene()
         {
-            actionViewController.Show();
-            queueViewController.Show();
             battleScene.SetActive(true);
+            queueViewController.Show();
         }
 
         private void HideBattleScene()
         {
-            battleScene.SetActive(false);
             actionViewController.Hide();
+            battleScene.SetActive(false);
         }
 
         private void OnEnable()
