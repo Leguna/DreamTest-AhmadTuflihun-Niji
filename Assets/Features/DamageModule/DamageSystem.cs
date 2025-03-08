@@ -1,3 +1,4 @@
+using DamageModule.HealthBar;
 using Features.DamageModule.DamagePopup;
 using Features.DamageModule.HealthBar;
 using UnityEngine;

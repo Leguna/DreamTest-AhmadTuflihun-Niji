@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Facing;
+using UnityEngine;
 
 namespace DamageModule.Interfaces
 {
@@ -9,6 +10,6 @@ namespace DamageModule.Interfaces
 
     public interface IDamageable<in T>
     {
-        void TryTakeDamage(int damage, GameObject attacker, T attackerSo);
+        void TryTakeDamage(T attackData, Transform attacker);
     }
 }

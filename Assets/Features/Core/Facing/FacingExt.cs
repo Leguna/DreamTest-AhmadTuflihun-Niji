@@ -44,12 +44,12 @@ namespace Facing
             };
         }
 
-        public static Side GetSide(this FacingDirection facingDirection, Vector2 target)
+        public static Side ToSide(this FacingDirection facingDirection, Vector2 target)
         {
-            return target.GetSide(facingDirection);
+            return target.ToSide(facingDirection);
         }
 
-        public static Side GetSide(this Vector2 target, FacingDirection facingDirection)
+        public static Side ToSide(this Vector2 target, FacingDirection facingDirection)
         {
             Vector2 direction = target.normalized;
             float dot = Vector2.Dot(direction, facingDirection.ToUnityVector2());

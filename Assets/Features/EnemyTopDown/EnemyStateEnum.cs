@@ -9,7 +9,8 @@
             Chase,
             Stun,
             CanAttack,
-            TryAttack
+            TryAttack,
+            Paused
         }
     }
 }

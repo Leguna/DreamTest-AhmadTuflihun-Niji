@@ -14,5 +14,7 @@ namespace TurnBasedCombat
         public int defend;
         public int magicDamage = 1;
         public int magicDefend;
+
+        public Sprite battleSprite;
     }
 }

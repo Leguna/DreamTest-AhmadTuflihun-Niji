@@ -110,8 +110,8 @@ GameObject:
   m_Component:
   - component: {fileID: 996068331832725703}
   - component: {fileID: 5623497280389450392}
-  - component: {fileID: 8665326004426570288}
   - component: {fileID: 1133465811837223811}
+  - component: {fileID: 6996079972075476702}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -190,23 +190,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8665326004426570288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5263212041521321684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73521e07328e42afa60470ad27d145e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorSprite: {fileID: 5623497280389450392}
-  onInteractCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  sceneToLoad: 3
 --- !u!61 &1133465811837223811
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -253,3 +236,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &6996079972075476702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263212041521321684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d54d9173c7184f1ebe0a60658d8f8795, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  doorSprite: {fileID: 5623497280389450392}
+  onInteractCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  sceneToLoad: 3
+  gameState: 4

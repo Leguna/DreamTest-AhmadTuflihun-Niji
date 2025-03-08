@@ -1,17 +1,18 @@
 ﻿using Facing;
+using PauseSystem;
 using UnityEngine;
 
 namespace TopDownPlayer
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class TopDownPlayerController : MonoBehaviour
+    public class TopDownPlayerController : MonoBehaviour, IPauseAble
     {
         [SerializeField] private TopDownPlayerCombat combat;
         
         private static readonly int X = Animator.StringToHash("MoveX");
         private static readonly int Y = Animator.StringToHash("MoveY");
         private static readonly int Moving = Animator.StringToHash("Moving");
-
+        
         private Vector2 _movement;
         private Rigidbody2D _rb;
         private Animator _animator;
@@ -22,19 +23,14 @@ namespace TopDownPlayer
 
         private FacingDirection _facingDirection;
 
-
         private PlayerState _playerState;
 
-        private void Awake()
-        {
-            Init();
-        }
-
-        private void Init()
+        public void Init(GameState gameState)
         {
             if (combat == null) TryGetComponent(out combat);
             _rb = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
+            combat.Init(gameState);
 
             InitInputAction();
             UpdateAnim();
@@ -78,6 +74,16 @@ namespace TopDownPlayer
         private void FixedUpdate()
         {
             _rb.linearVelocity = _movement.normalized * _model.MoveSpeed;
+        }
+
+        public void Pause()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Resume()
+        {
+            gameObject.SetActive(true);
         }
     }
 

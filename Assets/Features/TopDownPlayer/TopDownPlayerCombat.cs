@@ -20,18 +20,20 @@ namespace TopDownPlayer
 
         private bool _isAttacking;
         private float _attackCooldown;
-
-        public void TryTakeDamage(int damage, GameObject attacker, TurnBaseActorSo attackerSo)
+        private GameState _gameState;
+        
+        public void TryTakeDamage(TurnBaseActorSo attacker, Transform attackerTransform)
         {
-            var attackerDirection = attacker.transform.position - transform.position;
-            var attackerSide = _facingDirection.GetSide(attackerDirection);
-            Debug.Log($"Player took {damage} damage from{attackerSo.name} on {attackerSide}");
-            EventManager.TriggerEvent(new StartTurnBasedGameEventData(CombatStartType.Ambush, attackerSo, playerSo));
+            EventManager.TriggerEvent(new StartTurnBasedGameEventData(CombatStartType.Ambush, attacker));
+        }
+
+        private void OnFinish(FinishType obj)
+        {
         }
 
         public void Attack(FacingDirection facingDirection)
         {
-            if (_isAttacking) return;
+            if (_isAttacking || _gameState != GameState.Combat) return;
             StartCoroutine(AttackRoutine(facingDirection));
         }
 
@@ -48,7 +50,8 @@ namespace TopDownPlayer
                 if (collider2d.CompareTag(GameConst.PlayerObjectName)) continue;
                 if (collider2d.TryGetComponent<IDamageable<TurnBaseActorSo>>(out var damageable))
                 {
-                    damageable.TryTakeDamage(playerSo.damage, gameObject, playerSo);
+                    damageable.TryTakeDamage(playerSo, transform);
+                    break;
                 }
             }
 
@@ -64,9 +67,24 @@ namespace TopDownPlayer
             slashSpriteRenderer.transform.rotation = facingDirection.ToRotation(90);
         }
 
-        public void UpdateFacingDirection(FacingDirection facingDirection)
+        public void UpdateFacingDirection(FacingDirection facingDirection) => _facingDirection = facingDirection;
+        private void OnGameStateChange(StateGameChanges data) => _gameState = data.gameState;
+
+        private void OnEnable()
         {
-            _facingDirection = facingDirection;
+            EventManager.AddEventListener<FinishType>(OnFinish);
+            EventManager.AddEventListener<StateGameChanges>(OnGameStateChange);
+        }
+
+        private void OnDisable()
+        {
+            EventManager.RemoveEventListener<FinishType>(OnFinish);
+            EventManager.RemoveEventListener<StateGameChanges>(OnGameStateChange);
+        }
+
+        public void Init(GameState gameState)
+        {
+            _gameState = gameState;
         }
     }
 }

@@ -18,3 +18,4 @@ MonoBehaviour:
   defend: 0
   magicDamage: 1
   magicDefend: 0
+  battleSprite: {fileID: -1455096403836856330, guid: 748aacda271f26f43a778539eae690cb, type: 3}

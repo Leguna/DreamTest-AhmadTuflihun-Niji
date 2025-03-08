@@ -16,14 +16,13 @@ namespace LoadingModule
         [SerializeField] private GameObject overlayView;
         [SerializeField] private GameObject fullScreenView;
 
-        [SerializeField] private SceneIndexEnum defaultScene = SceneIndexEnum.ExploreScene;
         private SceneIndexEnum _currentScene;
 
         private readonly List<LoadingEventData> _tasks = new();
 
         private bool IsLoadingShow { get; set; }
 
-        public void Init()
+        public void Init(SceneIndexEnum defaultScene = SceneIndexEnum.ExploreScene)
         {
             EventManager.AddEventListener<LoadingEventData>(OnAddTask);
             EventManager.AddEventListener<LoadSceneEventData>(OnLoadScene);

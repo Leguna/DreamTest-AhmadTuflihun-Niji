@@ -1,5 +1,6 @@
 ﻿using Constant;
 using Core.Interactable;
+using DG.Tweening;
 using EventStruct;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,7 +14,7 @@ namespace TopDownMap.Interactable
 
         public UnityEvent<SceneIndexEnum> onInteractCallback;
 
-        [SerializeField] private SceneIndexEnum sceneToLoad;
+        [SerializeField] protected SceneIndexEnum sceneToLoad;
 
         private void Awake()
         {
@@ -28,7 +29,7 @@ namespace TopDownMap.Interactable
 
         public override void Interact()
         {
-            Debug.Log("Interacting with door");
+            DOTween.KillAll();
             EventManager.TriggerEvent(new LoadSceneEventData(sceneToLoad, true));
             onInteractCallback?.Invoke(sceneToLoad);
         }

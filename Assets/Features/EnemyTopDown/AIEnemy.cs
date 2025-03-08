@@ -1,14 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Constant;
 using DamageModule.Interfaces;
 using DG.Tweening;
+using EventStruct;
 using Facing;
+using PauseSystem;
 using TurnBasedCombat;
 using UnityEngine;
+using Utilities;
 
 namespace EnemyTopDown
 {
-    public partial class AIEnemy : MonoBehaviour, IDamageable<TurnBaseActorSo>
+    public partial class AIEnemy : MonoBehaviour, IDamageable<TurnBaseActorSo>, IPauseAble
     {
         [SerializeField] private Rigidbody2D rb;
         [SerializeField] private float moveSpeed = 5f;
@@ -30,7 +34,7 @@ namespace EnemyTopDown
         private FacingDirection _facingDirection;
 
         private Coroutine _attackCoroutine;
-
+        public Action onDeath;
 
         public void Init(TurnBaseActorSo enemySo, Vector2 enemySpawnPoint)
         {
@@ -44,9 +48,7 @@ namespace EnemyTopDown
 
         private void FixedUpdate()
         {
-            if (_currentState != EnemyState.CanAttack && _currentState != EnemyState.TryAttack &&
-                _currentState != EnemyState.Stun)
-                _currentState = DetermineState(transform, player);
+            DetermineState(transform, player);
 
             switch (_currentState)
             {
@@ -98,19 +100,26 @@ namespace EnemyTopDown
             _currentState = EnemyState.Idle;
         }
 
-        private EnemyState DetermineState(Transform currentTransform, Transform targetTransform)
+        private void DetermineState(Transform currentTransform, Transform targetTransform)
         {
+            var cannotDetectPlayer = _currentState is EnemyState.Stun or EnemyState.Paused or EnemyState.CanAttack
+                or EnemyState.TryAttack;
+            if (cannotDetectPlayer) return;
             var distanceToPlayer = Vector2.Distance(currentTransform.position, targetTransform.position);
 
             if (distanceToPlayer <= tryAttackRange)
             {
-                return EnemyState.CanAttack;
+                _currentState = EnemyState.CanAttack;
+                return;
             }
 
             if (distanceToPlayer <= chaseRange)
-                return EnemyState.Chase;
+            {
+                _currentState = EnemyState.Chase;
+                return;
+            }
 
-            return EnemyState.Roam;
+            _currentState = EnemyState.Roam;
         }
 
         void ChasePlayer()
@@ -148,16 +157,19 @@ namespace EnemyTopDown
             Gizmos.DrawWireSphere(position, attackRange);
         }
 
-        public void TryTakeDamage(int damage, GameObject attacker, TurnBaseActorSo attackerSo)
+        public void TryTakeDamage(TurnBaseActorSo attacker, Transform attackerTransform)
         {
             ResetAttack();
             if (_currentState == EnemyState.Stun) return;
 
-            var attackerDirection = attacker.transform.position - transform.position;
-            var attackerSide = _facingDirection.GetSide(attackerDirection);
-            Debug.Log($"Enemy took {damage} damage from {attackerSo.name} on {attackerSide}");
-            _currentState = EnemyState.Stun;
+            var attackerDirection = attackerTransform.position - transform.position;
+            var startType = _facingDirection.ToSide(attackerDirection).GetStartTypeBySide();
+            EventManager.TriggerEvent(new StartTurnBasedGameEventData(startType, attacker));
+        }
 
+        private void Stun()
+        {
+            _currentState = EnemyState.Stun;
             spriteRenderer.DOKill();
             transform.DOKill();
             spriteRenderer.color = Color.red;
@@ -173,13 +185,53 @@ namespace EnemyTopDown
             damageSequence.Play();
         }
 
+        private void OnFinish(FinishTurnBasedGameEventData eventData)
+        {
+            switch (eventData.finishType)
+            {
+                case FinishType.Win:
+                    onDeath?.Invoke();
+                    break;
+                case FinishType.Flee:
+                    Stun();
+                    break;
+            }
+        }
+
         private void OnCollisionEnter2D(Collision2D other)
         {
             if (other.gameObject.CompareTag(GameConst.PlayerObjectName) && _currentState == EnemyState.TryAttack)
             {
                 other.gameObject.GetComponent<IDamageable<TurnBaseActorSo>>()
-                    ?.TryTakeDamage(enemySo.damage, gameObject, enemySo);
+                    ?.TryTakeDamage(enemySo, transform);
             }
+        }
+
+        public void Pause() => _currentState = EnemyState.Paused;
+
+        public void Resume() => _currentState = EnemyState.Idle;
+
+        private void OnStartBattle(StartTurnBasedGameEventData data) => Pause();
+
+        private void OnPauseResume(PauseResumeEventData data)
+        {
+            if (data.isPause) Pause();
+            else Resume();
+        }
+
+        private void OnEnable()
+        {
+            EventManager.AddEventListener<FinishTurnBasedGameEventData>(OnFinish);
+            EventManager.AddEventListener<StartTurnBasedGameEventData>(OnStartBattle);
+            EventManager.AddEventListener<PauseResumeEventData>(OnPauseResume);
+        }
+
+        private void OnDisable()
+        {
+            EventManager.RemoveEventListener<StartTurnBasedGameEventData>(OnStartBattle);
+            EventManager.RemoveEventListener<FinishTurnBasedGameEventData>(OnFinish);
+            EventManager.RemoveEventListener<PauseResumeEventData>(OnPauseResume);
+            DOTween.KillAll();
         }
     }
 }

@@ -4,16 +4,18 @@ namespace EventStruct
 {
     public struct StartTurnBasedGameEventData
     {
-        public readonly CombatStartType combatStartType;
-        public readonly TurnBaseActorSo attackerSo;
-        public readonly TurnBaseActorSo playerSo;
+        public readonly CombatStartType startType;
+        public readonly TurnBaseActorSo attackerData;
 
-        public StartTurnBasedGameEventData(CombatStartType combatStartType, TurnBaseActorSo playerSo,
-            TurnBaseActorSo attackerSo)
+        public StartTurnBasedGameEventData(CombatStartType startType, TurnBaseActorSo attackerData)
         {
-            this.combatStartType = combatStartType;
-            this.attackerSo = attackerSo;
-            this.playerSo = playerSo;
+            this.startType = startType;
+            this.attackerData = attackerData;
+        }
+
+        public override string ToString()
+        {
+            return $"StartType: {startType}, AttackerData: {attackerData}";
         }
     }
 }

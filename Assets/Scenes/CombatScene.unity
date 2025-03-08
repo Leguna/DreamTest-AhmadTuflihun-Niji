@@ -165,6 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnedGameObject: {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
   spawnRadius: 3
+  maxSpawnCount: 1
 --- !u!1 &450675571
 GameObject:
   m_ObjectHideFlags: 0
@@ -2558,6 +2559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnedGameObject: {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
   spawnRadius: 1.05
+  maxSpawnCount: 1
 --- !u!4 &763124433
 Transform:
   m_ObjectHideFlags: 0
@@ -2604,6 +2606,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnedGameObject: {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
   spawnRadius: 2.8
+  maxSpawnCount: 1
 --- !u!4 &933695864
 Transform:
   m_ObjectHideFlags: 0
@@ -7362,6 +7365,56 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &1356599551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1356599552}
+  - component: {fileID: 1356599553}
+  m_Layer: 0
+  m_Name: EnemySpawnController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1356599552
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356599551}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1356599553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356599551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09d764d158aef334b8858c8a5082032b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
+  enemySpawnPoints: []
+  maxEnemyCount: 5
+  spawnDelay: 5
+  enemyPrefabs:
+  - {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
 --- !u!1001 &1390591908
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7413,6 +7466,14 @@ PrefabInstance:
     - target: {fileID: 5263212041521321684, guid: 7868cad2329533845851f59b22081850, type: 3}
       propertyPath: m_Name
       value: Door
+      objectReference: {fileID: 0}
+    - target: {fileID: 6996079972075476702, guid: 7868cad2329533845851f59b22081850, type: 3}
+      propertyPath: gameState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6996079972075476702, guid: 7868cad2329533845851f59b22081850, type: 3}
+      propertyPath: sceneToLoad
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8665326004426570288, guid: 7868cad2329533845851f59b22081850, type: 3}
       propertyPath: sceneToLoad
@@ -8613,6 +8674,7 @@ Rigidbody2D:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1356599552}
   - {fileID: 450675572}
   - {fileID: 211164380}
   - {fileID: 933695864}

@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c9ee64c7b8c4fedb8397ca5e93e15e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combat: {fileID: 0}
+  combat: {fileID: 473225508}
 --- !u!50 &473225502
 Rigidbody2D:
   serializedVersion: 5
@@ -974,56 +974,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &1356599551
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1356599552}
-  - component: {fileID: 1356599553}
-  m_Layer: 0
-  m_Name: EnemySpawnController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1356599552
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1356599551}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1356599553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1356599551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09d764d158aef334b8858c8a5082032b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
-  enemySpawnPoints: []
-  maxEnemyCount: 5
-  spawnDelay: 5
-  enemyPrefabs:
-  - {fileID: 268070181709371923, guid: 8101837b17ae3894c97a98685410e139, type: 3}
 --- !u!1 &1415068429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,6 +1149,8 @@ GameObject:
   - component: {fileID: 2029794366}
   - component: {fileID: 2029794367}
   - component: {fileID: 2029794368}
+  - component: {fileID: 2029794369}
+  - component: {fileID: 2029794370}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1234,7 +1186,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadingManager: {fileID: 2029794365}
-  gameState: 0
+  playerController: {fileID: 0}
+  turnBasedCombatController: {fileID: 0}
+  defaultScene: 2
 --- !u!114 &2029794365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1249,7 +1203,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayView: {fileID: 1424558813456636266, guid: 675083f192413a64e867782c1b065a41, type: 3}
   fullScreenView: {fileID: 4896071308822642588, guid: 0400c7f63bd8e4b438c5096e4f68cd84, type: 3}
-  defaultScene: 3
 --- !u!114 &2029794366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1306,6 +1259,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 854923a4c81642ffa605600a5ecbef00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2029794369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029794362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6c7dd1941384235b651e653f7755962, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2029794370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029794362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be2aced95a23456c80db0782e6a4cca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showUiDebug: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1315,4 +1293,3 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 473225504}
   - {fileID: 1415068432}
-  - {fileID: 1356599552}

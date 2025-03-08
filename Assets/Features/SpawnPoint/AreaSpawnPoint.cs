@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using Constant;
+using UnityEngine;
 
 namespace SpawnPoint
 {
     public class AreaSpawnPoint<T> : BaseSpawnPoint<T> where T : MonoBehaviour
     {
         [SerializeField] private float spawnRadius = 1f;
+        [SerializeField] private int maxSpawnCount = 1;
 
         public override T Spawn(Transform targetTransform)
         {
@@ -23,6 +25,16 @@ namespace SpawnPoint
         {
             Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(transform.position, spawnRadius);
+        }
+
+        public bool IsSpawned()
+        {
+            return transform.childCount > maxSpawnCount;
+        }
+
+        public bool IsPlayerInRange()
+        {
+            return Vector2.Distance(transform.position, GameConst.playerObject.transform.position) < spawnRadius;
         }
     }
 }

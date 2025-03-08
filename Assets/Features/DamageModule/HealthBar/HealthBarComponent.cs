@@ -1,13 +1,16 @@
 using DG.Tweening;
+using Features.DamageModule.HealthBar;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Features.DamageModule.HealthBar
+namespace DamageModule.HealthBar
 {
     public class HealthBarComponent : MonoBehaviour
     {
         [SerializeField] private Image healthBar;
         [SerializeField] private float changeSpeed = 0.5f;
+        [SerializeField] private TMP_Text healthText;
 
         private IHealthBar healthBarData;
 
@@ -34,6 +37,7 @@ namespace Features.DamageModule.HealthBar
         {
             var fillAmountFloat = (float)amount / healthBarData.MaxHealth;
             healthBar.DOFillAmount(fillAmountFloat, changeSpeed);
+            healthText.text = $"{amount}/{healthBarData.MaxHealth}";
         }
 
         private void DecreaseHealth(int amount)

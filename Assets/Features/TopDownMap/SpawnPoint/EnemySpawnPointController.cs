@@ -38,6 +38,7 @@ namespace TopDownMap.SpawnPoint
                     var enemySo = enemyPrefabs[Random.Range(0, enemyPrefabs.Count)].enemySo;
                     var enemySpawnPoint = GetRandomEnemySpawnPoint();
                     enemy.Init(enemySo, enemySpawnPoint);
+                    enemy.onDeath = () => ReturnObjectToPool(enemy);
                 }
 
                 yield return new WaitForSeconds(spawnDelay);
@@ -54,6 +55,11 @@ namespace TopDownMap.SpawnPoint
         private Vector2 GetRandomEnemySpawnPoint()
         {
             var randomIndex = Random.Range(0, enemySpawnPoints.Length);
+            while (enemySpawnPoints[randomIndex].IsSpawned() || enemySpawnPoints[randomIndex].IsPlayerInRange())
+            {
+                randomIndex = Random.Range(0, enemySpawnPoints.Length);
+            }
+
             return enemySpawnPoints[randomIndex].GetSpawnPosition();
         }
     }
