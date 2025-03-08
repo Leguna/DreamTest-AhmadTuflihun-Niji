@@ -117,7 +117,7 @@ namespace LoadingModule
             }
         }
 
-        private void LoadScene(SceneIndexEnum sceneIndex)
+        public void LoadScene(SceneIndexEnum sceneIndex)
         {
             _currentScene = sceneIndex;
             var task = SceneManager.LoadSceneAsync((int)sceneIndex, LoadSceneMode.Additive).ToUniTask().AsTask();

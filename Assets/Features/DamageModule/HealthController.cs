@@ -1,4 +1,5 @@
 ﻿using System;
+using DamageModule.HealthBar;
 using Features.DamageModule.HealthBar;
 using Features.DamageModule.Interfaces;
 using UnityEngine;

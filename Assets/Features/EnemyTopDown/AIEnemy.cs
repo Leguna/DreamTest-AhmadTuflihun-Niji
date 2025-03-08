@@ -7,6 +7,7 @@ using EventStruct;
 using Facing;
 using PauseSystem;
 using TurnBasedCombat;
+using TurnBasedCombat.SO;
 using UnityEngine;
 using Utilities;
 
@@ -66,6 +67,7 @@ namespace EnemyTopDown
                     break;
                 case EnemyState.TryAttack:
                 case EnemyState.Stun:
+                case EnemyState.Paused:
                     break;
             }
         }
@@ -164,7 +166,7 @@ namespace EnemyTopDown
 
             var attackerDirection = attackerTransform.position - transform.position;
             var startType = _facingDirection.ToSide(attackerDirection).GetStartTypeBySide();
-            EventManager.TriggerEvent(new StartTurnBasedGameEventData(startType, attacker));
+            EventManager.TriggerEvent(new StartTurnBasedGameEventData(startType, enemySo));
         }
 
         private void Stun()
@@ -185,6 +187,26 @@ namespace EnemyTopDown
             damageSequence.Play();
         }
 
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (other.gameObject.CompareTag(GameConst.PlayerObjectName) && _currentState == EnemyState.TryAttack)
+            {
+                other.gameObject.GetComponent<IDamageable<TurnBaseActorSo>>()
+                    ?.TryTakeDamage(enemySo, transform);
+            }
+        }
+
+        public void Pause()
+        {
+            DOTween.KillAll();
+            StopAllCoroutines();
+            _currentState = EnemyState.Paused;
+        }
+
+        public void Resume() => _currentState = EnemyState.Idle;
+
+        private void OnStartBattle(StartTurnBasedGameEventData data) => Pause();
+
         private void OnFinish(FinishTurnBasedGameEventData eventData)
         {
             switch (eventData.finishType)
@@ -197,21 +219,6 @@ namespace EnemyTopDown
                     break;
             }
         }
-
-        private void OnCollisionEnter2D(Collision2D other)
-        {
-            if (other.gameObject.CompareTag(GameConst.PlayerObjectName) && _currentState == EnemyState.TryAttack)
-            {
-                other.gameObject.GetComponent<IDamageable<TurnBaseActorSo>>()
-                    ?.TryTakeDamage(enemySo, transform);
-            }
-        }
-
-        public void Pause() => _currentState = EnemyState.Paused;
-
-        public void Resume() => _currentState = EnemyState.Idle;
-
-        private void OnStartBattle(StartTurnBasedGameEventData data) => Pause();
 
         private void OnPauseResume(PauseResumeEventData data)
         {

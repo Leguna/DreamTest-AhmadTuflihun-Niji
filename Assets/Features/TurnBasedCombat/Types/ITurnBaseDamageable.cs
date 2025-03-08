@@ -1,4 +1,5 @@
 ﻿using DamageModule.Interfaces;
+using TurnBasedCombat.SO;
 
 namespace TurnBasedCombat
 {

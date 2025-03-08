@@ -4,6 +4,7 @@ using LoadingModule;
 using TopDownPlayer;
 using TurnBasedCombat;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utilities;
 
 [RequireComponent(typeof(LoadingManager))]
@@ -11,38 +12,74 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     [SerializeField] private LoadingManager loadingManager;
     [SerializeField] private TopDownPlayerController playerPrefab;
-     private TurnBasedCombatController _turnBasedCombatController;
+    [SerializeField] private TurnBasedCombatController turnBasedCombatController;
     [SerializeField] private SceneIndexEnum defaultScene = SceneIndexEnum.ExploreScene;
+    [SerializeField] private PlayerCamera playerCamera;
 
-    public static GameState gameState = GameState.Explore;
+    private static GameState _gameState = GameState.Explore;
 
     protected override void Awake()
     {
-        gameState = SceneIndexEnum.ExploreScene == defaultScene ? GameState.Explore : GameState.Combat;
         var newPlayer = Instantiate(playerPrefab);
-        playerPrefab = newPlayer;        
-        playerPrefab.Init(gameState);
- 
+        playerPrefab = newPlayer;
         GameConst.Init();
         if (loadingManager == null) TryGetComponent(out loadingManager);
-        if (_turnBasedCombatController == null) TryGetComponent(out _turnBasedCombatController);
+
         loadingManager.Init(defaultScene);
-        _turnBasedCombatController.Init();
+        SceneManager.LoadScene((int) SceneIndexEnum.BattleScene, LoadSceneMode.Additive);
+        turnBasedCombatController = TurnBasedCombatController.Instance;
+    }
+
+    public void Start()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        _gameState = SceneIndexEnum.ExploreScene == defaultScene ? GameState.Explore : GameState.Combat;
+        playerPrefab.Init(_gameState);
+        turnBasedCombatController.Init();
+        playerCamera = FindFirstObjectByType<PlayerCamera>();
     }
 
     private void OnEnable()
     {
         EventManager.AddEventListener<StateGameChanges>(ChangeGameState);
+        EventManager.AddEventListener<StartTurnBasedGameEventData>(OnStartTurnBasedGame);
+    }
+
+    private void OnStartTurnBasedGame(StartTurnBasedGameEventData data)
+    {
+        ChangeGameState(new StateGameChanges(GameState.Battle));
     }
 
     private void OnDisable()
     {
         EventManager.RemoveEventListener<StateGameChanges>(ChangeGameState);
+        EventManager.RemoveEventListener<StartTurnBasedGameEventData>(OnStartTurnBasedGame);
     }
 
     private void ChangeGameState(StateGameChanges state)
     {
-        gameState = state.gameState;
+        _gameState = state.gameState;
+
+        switch (_gameState)
+        {
+            case GameState.Explore:
+            case GameState.Combat:
+                playerCamera.SetFollow(playerPrefab.transform);
+                break;
+            case GameState.Battle:
+                playerCamera.StopFollow();
+                break;
+        }
+    }
+
+
+    public void RestartGame()
+    {
+        loadingManager.Init(defaultScene);
     }
 }
 

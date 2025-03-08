@@ -36,7 +36,9 @@ namespace TopDownPlayer
 
         public void Init(GameState gameState)
         {
-            gameObject.SetActive(gameState != GameState.Battle);
+            EventManager.AddEventListener<StartTurnBasedGameEventData>(OnStartBattle);
+            EventManager.AddEventListener<FinishTurnBasedGameEventData>(OnFinishBattle);
+
             if (combat == null) TryGetComponent(out combat);
             _rb = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
@@ -67,7 +69,6 @@ namespace TopDownPlayer
             UpdateAnim();
         }
 
-
         private void UpdateAnim()
         {
             if (_animator == null) return;
@@ -83,18 +84,16 @@ namespace TopDownPlayer
 
         public void Pause()
         {
-            gameObject.SetActive(false);
+            _inputAction?.Disable();
         }
 
         public void Resume()
         {
-            gameObject.SetActive(true);
+            _inputAction?.Enable();
         }
 
         private void OnEnable()
         {
-            EventManager.AddEventListener<StartTurnBasedGameEventData>(OnStartBattle);
-            EventManager.AddEventListener<FinishTurnBasedGameEventData>(OnFinishBattle);
         }
 
         private void OnStartBattle(StartTurnBasedGameEventData obj) => Pause();

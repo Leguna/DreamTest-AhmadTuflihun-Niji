@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using EnemyTopDown;
+using EventStruct;
 using SpawnPoint;
 using UnityEngine;
+using Utilities;
 using Utilities.Pooling;
 
 namespace TopDownMap.SpawnPoint
@@ -26,6 +28,18 @@ namespace TopDownMap.SpawnPoint
             Init(enemyPrefabs[0], maxEnemyCount);
             GetAllEnemySpawnPoint();
             StartCoroutine(StartSpawnEnemy());
+        }
+
+        private void OnEnable()
+        {
+            EventManager.AddEventListener<StartTurnBasedGameEventData>(Pause);
+            EventManager.AddEventListener<FinishTurnBasedGameEventData>(Resume);
+        }
+
+        private void OnDisable()
+        {
+            EventManager.RemoveEventListener<StartTurnBasedGameEventData>(Pause);
+            EventManager.RemoveEventListener<FinishTurnBasedGameEventData>(Resume);
         }
 
         IEnumerator StartSpawnEnemy()
@@ -62,5 +76,9 @@ namespace TopDownMap.SpawnPoint
 
             return enemySpawnPoints[randomIndex].GetSpawnPosition();
         }
+
+        public void Pause(StartTurnBasedGameEventData data) => StopAllCoroutines();
+
+        public void Resume(FinishTurnBasedGameEventData data) => StartCoroutine(StartSpawnEnemy());
     }
 }

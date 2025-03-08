@@ -4,6 +4,7 @@ using DamageModule.Interfaces;
 using EventStruct;
 using Facing;
 using TurnBasedCombat;
+using TurnBasedCombat.SO;
 using UnityEngine;
 using Utilities;
 
@@ -14,6 +15,7 @@ namespace TopDownPlayer
         [SerializeField] private TurnBaseActorSo playerSo;
         [SerializeField] private SpriteRenderer slashSpriteRenderer;
         [SerializeField] private Animator animator;
+        [SerializeField] private PlayerCamera playerCamera;
 
         private FacingDirection _facingDirection;
         private static readonly int AttackAnimTrigger = Animator.StringToHash("Attack");
@@ -21,7 +23,7 @@ namespace TopDownPlayer
         private bool _isAttacking;
         private float _attackCooldown;
         private GameState _gameState;
-        
+
         public void TryTakeDamage(TurnBaseActorSo attacker, Transform attackerTransform)
         {
             EventManager.TriggerEvent(new StartTurnBasedGameEventData(CombatStartType.Ambush, attacker));
@@ -68,7 +70,11 @@ namespace TopDownPlayer
         }
 
         public void UpdateFacingDirection(FacingDirection facingDirection) => _facingDirection = facingDirection;
-        private void OnGameStateChange(StateGameChanges data) => _gameState = data.gameState;
+
+        private void OnGameStateChange(StateGameChanges data)
+        {
+            _gameState = data.gameState;
+        }
 
         private void OnEnable()
         {
@@ -84,6 +90,7 @@ namespace TopDownPlayer
 
         public void Init(GameState gameState)
         {
+            TryGetComponent(out playerCamera);
             _gameState = gameState;
         }
     }

@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33b6fa22675e4df89703b32b6db17283, type: 3}
   m_Name: Slime
   m_EditorClassIdentifier: 
-  speed: 3
-  health: 1
+  speed: 4
+  health: 5
+  maxHealth: 10
   damage: 2
+  spellDamage: 1
   defend: 0
-  magicDamage: 1
-  magicDefend: 0
-  battleSprite: {fileID: 1208040086343421634, guid: c56a71c8c4f643f4da2c24d69f11a5cc, type: 3}
+  battleSprite: {fileID: 21300000, guid: d3e2e4b8154b6cc438dd992f952cc7cb, type: 3}
+  iconQueue: {fileID: -5922754114360663000, guid: 483255bc59b51ea408cff66a9346e9af, type: 3}
+  color: {r: 1, g: 0.2783019, b: 0.2783019, a: 1}
+  teamColor: {r: 0.4716981, g: 0.09567462, b: 0.09567462, a: 1}

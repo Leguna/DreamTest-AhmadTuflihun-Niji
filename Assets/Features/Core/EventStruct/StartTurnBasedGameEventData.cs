@@ -1,4 +1,5 @@
 ﻿using TurnBasedCombat;
+using TurnBasedCombat.SO;
 
 namespace EventStruct
 {

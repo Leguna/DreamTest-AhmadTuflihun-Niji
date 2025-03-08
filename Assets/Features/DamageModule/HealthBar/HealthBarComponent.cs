@@ -1,5 +1,4 @@
 using DG.Tweening;
-using Features.DamageModule.HealthBar;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,45 +10,46 @@ namespace DamageModule.HealthBar
         [SerializeField] private Image healthBar;
         [SerializeField] private float changeSpeed = 0.5f;
         [SerializeField] private TMP_Text healthText;
+        [SerializeField] private Vector3 offset = new Vector3(0, 5, 0);
 
-        private IHealthBar healthBarData;
+        private IHealthBar _healthBarData;
 
         public void Init(IHealthBar newHealthBarData, Transform newTargetTransform, Vector3 offset = default)
         {
+            if (offset == default) offset = this.offset;
+
             transform.SetParent(newTargetTransform);
             GetComponent<Canvas>().worldCamera = Camera.main;
             transform.localPosition = offset;
 
-            healthBarData = newHealthBarData;
-            healthBar.color = healthBarData.Color;
+            _healthBarData = newHealthBarData;
+            healthBar.color = _healthBarData.Color;
 
-            SetListener(healthBarData);
-            UpdateBar(healthBarData.CurrentHealth);
+            SetListener(_healthBarData);
+            UpdateBar(_healthBarData.CurrentHealth);
         }
 
         private void SetListener(IHealthBar newHealthBarData)
         {
-            newHealthBarData.OnDamageTaken += DecreaseHealth;
-            newHealthBarData.OnHealTaken += IncreaseHealth;
         }
 
-        private void UpdateBar(int amount)
+        public void UpdateBar(int amount)
         {
-            var fillAmountFloat = (float)amount / healthBarData.MaxHealth;
+            var fillAmountFloat = (float)amount / _healthBarData.MaxHealth;
             healthBar.DOFillAmount(fillAmountFloat, changeSpeed);
-            healthText.text = $"{amount}/{healthBarData.MaxHealth}";
+            healthText.text = $"{amount}/{_healthBarData.MaxHealth}";
         }
 
         private void DecreaseHealth(int amount)
         {
-            healthBarData.CurrentHealth -= amount;
-            UpdateBar(healthBarData.CurrentHealth);
+            _healthBarData.CurrentHealth -= amount;
+            UpdateBar(_healthBarData.CurrentHealth);
         }
 
         private void IncreaseHealth(int amount)
         {
-            healthBarData.CurrentHealth += amount;
-            UpdateBar(healthBarData.CurrentHealth);
+            _healthBarData.CurrentHealth += amount;
+            UpdateBar(_healthBarData.CurrentHealth);
         }
     }
 }

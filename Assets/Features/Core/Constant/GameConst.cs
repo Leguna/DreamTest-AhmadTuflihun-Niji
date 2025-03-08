@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TurnBasedCombat;
+using UnityEngine;
 
 namespace Constant
 {
@@ -21,7 +22,8 @@ namespace Constant
 
         public static GameObject playerObject;
         public static GameObject playerCameraObject;
-        
+        public static TurnBasedCombatController turnBasedCombatController;
+
         public static void Init()
         {
             playerObject = GameObject.FindGameObjectWithTag(PlayerObjectName);

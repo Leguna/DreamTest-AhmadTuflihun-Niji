@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33b6fa22675e4df89703b32b6db17283, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  speed: 2
-  health: 1
+  speed: 6
+  health: 10
+  maxHealth: 10
   damage: 2
+  spellDamage: 1
   defend: 0
-  magicDamage: 1
-  magicDefend: 0
-  battleSprite: {fileID: -1455096403836856330, guid: 748aacda271f26f43a778539eae690cb, type: 3}
+  battleSprite: {fileID: 21300000, guid: 748aacda271f26f43a778539eae690cb, type: 3}
+  iconQueue: {fileID: 533925764876870624, guid: 404b2b30579a4ac4e86aa66bf7afbf48, type: 3}
+  color: {r: 0.2559185, g: 0.764151, b: 0.5553423, a: 1}
+  teamColor: {r: 0.1549929, g: 0.4056604, b: 0.15655954, a: 1}

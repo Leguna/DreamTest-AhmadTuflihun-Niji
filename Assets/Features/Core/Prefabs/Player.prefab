@@ -542,7 +542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4622a792813b432988ae5bfcf1c3c15f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 0}
 --- !u!114 &1181778010862148772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,6 +569,7 @@ MonoBehaviour:
   playerSo: {fileID: 11400000, guid: 7ac5619fb5a09a34ab6c13a93cf6c314, type: 2}
   slashSpriteRenderer: {fileID: 7335560015774978581}
   animator: {fileID: 1104118665037668763}
+  playerCamera: {fileID: 7529927339541437643}
 --- !u!1 &7416089533486119597
 GameObject:
   m_ObjectHideFlags: 0
