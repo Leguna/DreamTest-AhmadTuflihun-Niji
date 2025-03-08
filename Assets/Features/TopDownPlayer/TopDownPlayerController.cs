@@ -1,18 +1,27 @@
-﻿using Facing;
+﻿using EventStruct;
+using Facing;
 using PauseSystem;
 using UnityEngine;
+using Utilities;
 
 namespace TopDownPlayer
 {
+    internal enum PlayerState
+    {
+        Idle,
+        Moving,
+        Attacking
+    }
+
     [RequireComponent(typeof(Rigidbody2D))]
     public class TopDownPlayerController : MonoBehaviour, IPauseAble
     {
         [SerializeField] private TopDownPlayerCombat combat;
-        
+
         private static readonly int X = Animator.StringToHash("MoveX");
         private static readonly int Y = Animator.StringToHash("MoveY");
         private static readonly int Moving = Animator.StringToHash("Moving");
-        
+
         private Vector2 _movement;
         private Rigidbody2D _rb;
         private Animator _animator;
@@ -27,6 +36,7 @@ namespace TopDownPlayer
 
         public void Init(GameState gameState)
         {
+            gameObject.SetActive(gameState != GameState.Battle);
             if (combat == null) TryGetComponent(out combat);
             _rb = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
@@ -57,11 +67,6 @@ namespace TopDownPlayer
             UpdateAnim();
         }
 
-        private void OnDisable()
-        {
-            _inputAction?.Disable();
-        }
-
 
         private void UpdateAnim()
         {
@@ -85,12 +90,22 @@ namespace TopDownPlayer
         {
             gameObject.SetActive(true);
         }
-    }
 
-    internal enum PlayerState
-    {
-        Idle,
-        Moving,
-        Attacking
+        private void OnEnable()
+        {
+            EventManager.AddEventListener<StartTurnBasedGameEventData>(OnStartBattle);
+            EventManager.AddEventListener<FinishTurnBasedGameEventData>(OnFinishBattle);
+        }
+
+        private void OnStartBattle(StartTurnBasedGameEventData obj) => Pause();
+
+        private void OnFinishBattle(FinishTurnBasedGameEventData obj) => Resume();
+
+        private void OnDisable()
+        {
+            _inputAction?.Disable();
+            EventManager.RemoveEventListener<StartTurnBasedGameEventData>(OnStartBattle);
+            EventManager.RemoveEventListener<FinishTurnBasedGameEventData>(OnFinishBattle);
+        }
     }
 }

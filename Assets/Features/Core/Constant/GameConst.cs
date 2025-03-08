@@ -24,7 +24,7 @@ namespace Constant
         
         public static void Init()
         {
-            playerObject = GameObject.Find(PlayerObjectName);
+            playerObject = GameObject.FindGameObjectWithTag(PlayerObjectName);
             playerCameraObject = GameObject.Find(PlayerCameraObjectName);
         }
     }

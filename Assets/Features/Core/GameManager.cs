@@ -10,22 +10,24 @@ using Utilities;
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     [SerializeField] private LoadingManager loadingManager;
-    [SerializeField] private TopDownPlayerController playerController;
-    [SerializeField] private TurnBasedCombatController turnBasedCombatController;
+    [SerializeField] private TopDownPlayerController playerPrefab;
+     private TurnBasedCombatController _turnBasedCombatController;
     [SerializeField] private SceneIndexEnum defaultScene = SceneIndexEnum.ExploreScene;
 
     public static GameState gameState = GameState.Explore;
 
     protected override void Awake()
     {
+        gameState = SceneIndexEnum.ExploreScene == defaultScene ? GameState.Explore : GameState.Combat;
+        var newPlayer = Instantiate(playerPrefab);
+        playerPrefab = newPlayer;        
+        playerPrefab.Init(gameState);
+ 
         GameConst.Init();
         if (loadingManager == null) TryGetComponent(out loadingManager);
-        if (turnBasedCombatController == null) TryGetComponent(out turnBasedCombatController);
-        if (playerController == null) GameConst.playerObject.TryGetComponent(out playerController);
+        if (_turnBasedCombatController == null) TryGetComponent(out _turnBasedCombatController);
         loadingManager.Init(defaultScene);
-        turnBasedCombatController.Init();
-        gameState = SceneIndexEnum.ExploreScene == defaultScene ? GameState.Explore : GameState.Combat;
-        playerController.Init(GameState.Explore);
+        _turnBasedCombatController.Init();
     }
 
     private void OnEnable()

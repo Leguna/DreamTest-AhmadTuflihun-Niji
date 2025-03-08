@@ -6,7 +6,7 @@ namespace Utilities
 {
     public class PlayerCamera : MonoBehaviour
     {
-        [SerializeField] private CinemachineCamera _camera;
+        private CinemachineCamera _camera;
         private CinemachineConfiner2D _cinemachineConfiner2D;
 
         private void Awake()
@@ -16,6 +16,7 @@ namespace Utilities
 
         private void Init()
         {
+            _camera = FindFirstObjectByType<CinemachineCamera>();
             _camera.Follow = transform;
             SearchBounding();
         }
